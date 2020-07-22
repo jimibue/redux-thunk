@@ -44,10 +44,6 @@ export const addProduct = (product, history) => {
   };
 };
 
-export const toggleForm () =>{
-  return({type:"TOGGLE", payload:true})
-}
-
 // e.preventDefault();
 // const product = { ...this.state };
 // axios.post("/api/products", product).then(res => {
