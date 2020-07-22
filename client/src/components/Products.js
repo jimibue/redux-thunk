@@ -2,37 +2,16 @@ import React from "react";
 import { Card, Header, Button } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { connect } from "react-redux";
+import { getProducts, deleteProduct, editProduct } from "../reducers/products";
 
 class Products extends React.Component {
-  state = { products: [] };
-
   componentDidMount() {
-    axios.get("/api/products").then((res) => {
-      this.setState({ products: res.data });
-    });
+    if (this.props.products.length == 0) this.props.getProducts();
   }
-  delete = (id) => {
-    axios.delete(`/api/products/${id}`).then((res) => {
-      console.log(res);
-      const newProds = this.state.products.filter((p) => p.id !== res.data.id);
-      this.setState({ products: newProds });
-    });
-  };
-
-  edit = (id) => {
-    axios.put(`/api/products/${id}`).then((res) => {
-      console.log(res);
-      const newProds = this.state.products.map((p) => {
-        if (p.id == res.data.id) return res.data;
-        return p;
-      });
-      this.setState({ products: newProds });
-    });
-    
-  };
 
   renderProducts = () => {
-    const { products } = this.state;
+    const { products, deleteProduct, editProduct } = this.props;
 
     if (products.length <= 0) return <h2>No Products</h2>;
     return products.map((product) => (
@@ -46,10 +25,10 @@ class Products extends React.Component {
           <Button as={Link} to={`/products/${product.id}`} color="blue">
             View
           </Button>
-          <Button onClick={() => this.delete(product.id)} color="red">
+          <Button onClick={() => deleteProduct(product.id)} color="red">
             Delete
           </Button>
-          <Button onClick={() => this.edit(product.id)} color="blue">
+          <Button onClick={() => editProduct(product.id)} color="blue">
             Edit
           </Button>
         </Card.Content>
@@ -73,4 +52,14 @@ class Products extends React.Component {
   }
 }
 
-export default Products;
+const mapStateToProps = (state) => ({
+  products: state.products,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  getProducts: () => dispatch(getProducts()),
+  deleteProduct: (id) => dispatch(deleteProduct(id)),
+  editProduct: (id) => dispatch(editProduct(id)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Products);
